@@ -1,18 +1,32 @@
 package com.kwizzle.dto;
 
+import com.kwizzle.enums.Role;
+import com.kwizzle.enums.UserStatus;
+import java.time.LocalDateTime;
+
 public class UserDTO {
     private Long id;
     private String name;
     private String username;
     private String email;
+    private Role role;
+    private UserStatus status;
+    private LocalDateTime registeredAt;
+    private LocalDateTime lastLogin;
+    private String profile;
 
     public UserDTO() {}
 
-    public UserDTO(Long id, String name, String username, String email) {
+    public UserDTO(Long id, String name, String username, String email, Role role, UserStatus status, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
+        this.role = role;
+        this.status = status;
+        this.registeredAt = registeredAt;
+        this.lastLogin = lastLogin;
+        this.profile = profile;
     }
 
     public Long getId() {
@@ -45,5 +59,45 @@ public class UserDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getRegisteredAt() {
+        return registeredAt;
+    }
+
+    public void setRegisteredAt(LocalDateTime registeredAt) {
+        this.registeredAt = registeredAt;
+    }
+
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 }
