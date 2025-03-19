@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "quiz")
-public class quiz {
+public class Quiz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,10 +54,10 @@ public class quiz {
     private LocalDateTime endsAt;
 
     // Constructor tanpa parameter
-    public quiz() {}
+    public Quiz() {}
 
     // Constructor dengan parameter lengkap
-    public quiz(Long id, Long hostId, Long categoryId, String title, String metaTitle, String slug, String summary,
+    public Quiz(Long id, Long hostId, Long categoryId, String title, String metaTitle, String slug, String summary,
                 Long typeId, int score, boolean published, Integer timeLimit, String joinCode,
                 LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt,
                 LocalDateTime startsAt, LocalDateTime endsAt) {
