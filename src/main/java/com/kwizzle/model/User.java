@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-public class users {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,10 +38,10 @@ public class users {
     private String profile;
 
     // Constructor tanpa parameter
-    public users() {}
+    public User() {}
 
     // Constructor dengan parameter lengkap
-    public users(Long id, String name, String username, String email, String passwordHash,
+    public User(Long id, String name, String username, String email, String passwordHash,
                 Long roleId, Long statusId, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile) {
         this.id = id;
         this.name = name;
