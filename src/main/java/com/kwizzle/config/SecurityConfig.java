@@ -1,7 +1,9 @@
 package com.kwizzle.config;
 
+import com.kwizzle.enums.UserStatus;
 import com.kwizzle.security.JwtAuthenticationFilter;
 import com.kwizzle.repository.UserRepository;
+import com.kwizzle.service.UserService;  // Assuming UserService is being used to handle user authentication
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +36,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/register", "/api/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
@@ -57,7 +59,12 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(username -> (org.springframework.security.core.userdetails.UserDetails) userRepository.findByUsername(username)
+        provider.setUserDetailsService(username -> userRepository.findByUsername(username)
+                .map(user -> new org.springframework.security.core.userdetails.User(
+                        user.getUsername(),
+                        user.getPasswordHash(),
+                        user.getStatus() == UserStatus.ACTIVE, // Assuming the user needs to be active to login
+                        true, true, true, user.getRole().getAuthorities()))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found")));
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
