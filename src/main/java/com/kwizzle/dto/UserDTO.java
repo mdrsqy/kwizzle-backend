@@ -2,8 +2,6 @@ package com.kwizzle.dto;
 
 import com.kwizzle.enums.Role;
 import com.kwizzle.enums.UserStatus;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.time.LocalDateTime;
 
 public class UserDTO {
@@ -11,36 +9,28 @@ public class UserDTO {
     private String name;
     private String username;
     private String email;
+    private String password;
     private Role role;
     private UserStatus status;
     private LocalDateTime registeredAt;
     private LocalDateTime lastLogin;
     private String profile;
-    private String token;  // Menambahkan token
+    private String token;
 
     public UserDTO() {}
 
-    public UserDTO(Long id, String name, String username, String email, Role role, UserStatus status, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile) {
+    public UserDTO(Long id, String name, String username, String email, String password, Role role, UserStatus status, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile, String token) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
+        this.password = password;
         this.role = role;
         this.status = status;
         this.registeredAt = registeredAt;
         this.lastLogin = lastLogin;
         this.profile = profile;
-    }
-
-    public UserDTO(Long id, String name, String username, String email, Role role, UserStatus status, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile, String token) {
-        this(id, name, username, email, role, status, registeredAt, lastLogin, profile);
-        this.token = token;  // Menginisialisasi token
-    }
-
-    public UserDTO(Long id, String name, UserDetails username, String email, Role role, UserStatus status, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile) {
-    }
-
-    public UserDTO(Long id, String name, UserDetails username, String email, Role role, UserStatus status, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile, String token) {
+        this.token = token;
     }
 
     public Long getId() {
@@ -73,6 +63,14 @@ public class UserDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Role getRole() {

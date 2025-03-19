@@ -5,8 +5,8 @@ import com.kwizzle.dto.UserDTO;
 import com.kwizzle.model.User;
 import com.kwizzle.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,7 +47,7 @@ public class UserService {
         user.setName(userDTO.getName());
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(userDTO.getEmail()));
+        user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole());
         user.setStatus(userDTO.getStatus());
         user.setRegisteredAt(LocalDateTime.now());
@@ -56,21 +56,15 @@ public class UserService {
 
         user = userRepository.save(user);
 
-        // Now passing the User object instead of just the username
-        String token = jwtUtil.generateToken((UserDetails) user);
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPasswordHash())
+                .roles(user.getRole().name())
+                .build();
 
-        return new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getRole(),
-                user.getStatus(),
-                user.getRegisteredAt(),
-                user.getLastLogin(),
-                user.getProfile(),
-                token
-        );
+        String token = jwtUtil.generateToken(userDetails);
+
+        return convertToDTO(user, token);
     }
 
     public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
@@ -101,20 +95,14 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (passwordEncoder.matches(password, user.getPasswordHash())) {
-            // Passing the User object instead of just the username
-            String token = jwtUtil.generateToken((UserDetails) user);
-            return new UserDTO(
-                    user.getId(),
-                    user.getName(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getRole(),
-                    user.getStatus(),
-                    user.getRegisteredAt(),
-                    user.getLastLogin(),
-                    user.getProfile(),
-                    token
-            );
+            UserDetails userDetails = org.springframework.security.core.userdetails.User
+                    .withUsername(user.getUsername())
+                    .password(user.getPasswordHash())
+                    .roles(user.getRole().name())
+                    .build();
+
+            String token = jwtUtil.generateToken(userDetails);
+            return convertToDTO(user, token);
         } else {
             throw new IllegalArgumentException("Invalid password");
         }
@@ -126,11 +114,29 @@ public class UserService {
                 user.getName(),
                 user.getUsername(),
                 user.getEmail(),
+                user.getPasswordHash(),
                 user.getRole(),
                 user.getStatus(),
                 user.getRegisteredAt(),
                 user.getLastLogin(),
-                user.getProfile()
+                user.getProfile(),
+                null
+        );
+    }
+
+    private UserDTO convertToDTO(User user, String token) {
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPasswordHash(),
+                user.getRole(),
+                user.getStatus(),
+                user.getRegisteredAt(),
+                user.getLastLogin(),
+                user.getProfile(),
+                token
         );
     }
 }
