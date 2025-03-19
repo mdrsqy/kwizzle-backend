@@ -1,12 +1,13 @@
 package com.kwizzle.model;
 
+import com.kwizzle.enums.Role;
+import com.kwizzle.enums.UserStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,48 +15,33 @@ public class User {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
 
     @Column(nullable = false, length = 255)
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Long roleId;
+    private Role role;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Long statusId;
+    private UserStatus status;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime registeredAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime registeredAt = LocalDateTime.now();
 
+    @Column
     private LocalDateTime lastLogin;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String profile;
 
-    // Constructor tanpa parameter
-    public User() {}
-
-    // Constructor dengan parameter lengkap
-    public User(Long id, String name, String username, String email, String passwordHash,
-                Long roleId, Long statusId, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile) {
-        this.id = id;
-        this.name = name;
-        this.username = username;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.roleId = roleId;
-        this.statusId = statusId;
-        this.registeredAt = registeredAt;
-        this.lastLogin = lastLogin;
-        this.profile = profile;
-    }
-
-    // Getter dan Setter untuk setiap atribut
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -96,20 +82,20 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
-    public Long getRoleId() {
-        return roleId;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
-    public Long getStatusId() {
-        return statusId;
+    public UserStatus getStatus() {
+        return status;
     }
 
-    public void setStatusId(Long statusId) {
-        this.statusId = statusId;
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getRegisteredAt() {
