@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,10 @@ public class UserService {
     }
 
     public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public Optional<UserDTO> getUserById(Long id) {
@@ -43,6 +47,13 @@ public class UserService {
     }
 
     public UserDTO createUser(UserDTO userDTO) {
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
         User user = new User();
         user.setName(userDTO.getName());
         user.setUsername(userDTO.getUsername());
@@ -51,19 +62,12 @@ public class UserService {
         user.setRole(userDTO.getRole());
         user.setStatus(userDTO.getStatus());
         user.setRegisteredAt(LocalDateTime.now());
-        user.setLastLogin(LocalDateTime.now());
+        user.setLastLogin(null);
         user.setProfile(userDTO.getProfile());
 
         user = userRepository.save(user);
 
-        UserDetails userDetails = org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPasswordHash())
-                .roles(user.getRole().name())
-                .build();
-
-        String token = jwtUtil.generateToken(userDetails);
-
+        String token = generateUserToken(user);
         return convertToDTO(user, token);
     }
 
@@ -74,7 +78,6 @@ public class UserService {
             user.setEmail(userDTO.getEmail());
             user.setRole(userDTO.getRole());
             user.setStatus(userDTO.getStatus());
-            user.setLastLogin(LocalDateTime.now());
             user.setProfile(userDTO.getProfile());
 
             user = userRepository.save(user);
@@ -94,34 +97,29 @@ public class UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (passwordEncoder.matches(password, user.getPasswordHash())) {
-            UserDetails userDetails = org.springframework.security.core.userdetails.User
-                    .withUsername(user.getUsername())
-                    .password(user.getPasswordHash())
-                    .roles(user.getRole().name())
-                    .build();
+        validatePassword(password, user.getPasswordHash());
 
-            String token = jwtUtil.generateToken(userDetails);
-            return convertToDTO(user, token);
-        } else {
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+
+        String token = generateUserToken(user);
+        return convertToDTO(user, token);
+    }
+
+    private void validatePassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new IllegalArgumentException("Invalid password");
         }
     }
 
-    private UserDTO convertToDTO(User user) {
-        return new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPasswordHash(),
-                user.getRole(),
-                user.getStatus(),
-                user.getRegisteredAt(),
-                user.getLastLogin(),
-                user.getProfile(),
-                null
-        );
+    private String generateUserToken(User user) {
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPasswordHash())
+                .roles(user.getRole().name())
+                .build();
+
+        return jwtUtil.generateToken(userDetails);
     }
 
     private UserDTO convertToDTO(User user, String token) {
@@ -137,6 +135,22 @@ public class UserService {
                 user.getLastLogin(),
                 user.getProfile(),
                 token
+        );
+    }
+
+    private UserDTO convertToDTO(User user) {
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPasswordHash(),
+                user.getRole(),
+                user.getStatus(),
+                user.getRegisteredAt(),
+                user.getLastLogin(),
+                user.getProfile(),
+                null
         );
     }
 }
