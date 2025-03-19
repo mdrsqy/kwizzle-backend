@@ -17,13 +17,32 @@ public class UserService {
     }
 
     public List<UserDTO> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(user -> new UserDTO(user.getId(), user.getName(), user.getUsername(), user.getEmail()))
-                .collect(Collectors.toList());
+        return userRepository.findAll().stream().map(UserDTO::new).collect(Collectors.toList());
     }
 
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        return new UserDTO(user.getId(), user.getName(), user.getUsername(), user.getEmail());
+        return new UserDTO(user);
+    }
+
+    public UserDTO createUser(UserDTO userDTO) {
+        User user = new User(userDTO);
+        user = userRepository.save(user);
+        return new UserDTO(user);
+    }
+
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setName(userDTO.getName());
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setRole(userDTO.getRole());
+        user.setStatus(userDTO.getStatus());
+        user = userRepository.save(user);
+        return new UserDTO(user);
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 }
