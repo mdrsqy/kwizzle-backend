@@ -1,7 +1,7 @@
 package com.kwizzle.model;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "quiz_answer")
@@ -15,28 +15,27 @@ public class QuizAnswer {
     @JoinColumn(name = "question_id", nullable = false)
     private QuizQuestion question;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "is_correct", nullable = false)
-    private boolean isCorrect = false;
+    @Column(name = "is_correct", columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean isCorrect;
 
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createdAt;
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
 
-    // Constructor kosong
-    public QuizAnswer() {
-    }
+    // Constructors
+    public QuizAnswer() {}
 
-    // Constructor dengan parameter
-    public QuizAnswer(QuizQuestion question, String content, boolean isCorrect, Timestamp createdAt) {
+    public QuizAnswer(Long id, QuizQuestion question, String content, boolean isCorrect, LocalDateTime createdAt) {
+        this.id = id;
         this.question = question;
         this.content = content;
         this.isCorrect = isCorrect;
         this.createdAt = createdAt;
     }
 
-    // Getter dan Setter
+    // Getters & Setters
     public Long getId() {
         return id;
     }
@@ -69,23 +68,11 @@ public class QuizAnswer {
         isCorrect = correct;
     }
 
-    public Timestamp getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    // toString untuk debugging
-    @Override
-    public String toString() {
-        return "QuizAnswer{" +
-                "id=" + id +
-                ", question=" + question +
-                ", content='" + content + '\'' +
-                ", isCorrect=" + isCorrect +
-                ", createdAt=" + createdAt +
-                '}';
     }
 }
