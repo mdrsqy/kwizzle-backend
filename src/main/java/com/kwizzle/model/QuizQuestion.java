@@ -1,7 +1,8 @@
 package com.kwizzle.model;
 
+import com.kwizzle.enums.QuestionType;
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "quiz_question")
@@ -11,39 +12,40 @@ public class QuizQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "quiz_id", nullable = false)
-    private Long quizId;
+    @ManyToOne
+    @JoinColumn(name = "quiz_id", nullable = false)
+    private Quiz quiz;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type_id", nullable = false)
-    private Long typeId;
+    private QuestionType type;
 
-    @Column(name = "is_private", nullable = false)
-    private Boolean isPrivate = false;
+    @Column(name = "is_private", columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean isPrivate;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createdAt;
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp updatedAt;
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime updatedAt;
 
-    // Constructor kosong
-    public QuizQuestion() {
-    }
+    // Constructors
+    public QuizQuestion() {}
 
-    // Constructor dengan parameter
-    public QuizQuestion(Long quizId, Long typeId, Boolean isPrivate, String content, Timestamp createdAt, Timestamp updatedAt) {
-        this.quizId = quizId;
-        this.typeId = typeId;
+    public QuizQuestion(Long id, Quiz quiz, QuestionType type, boolean isPrivate, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.quiz = quiz;
+        this.type = type;
         this.isPrivate = isPrivate;
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // Getter dan Setter
+    // Getters & Setters
     public Long getId() {
         return id;
     }
@@ -52,28 +54,28 @@ public class QuizQuestion {
         this.id = id;
     }
 
-    public Long getQuizId() {
-        return quizId;
+    public Quiz getQuiz() {
+        return quiz;
     }
 
-    public void setQuizId(Long quizId) {
-        this.quizId = quizId;
+    public void setQuiz(Quiz quiz) {
+        this.quiz = quiz;
     }
 
-    public Long getTypeId() {
-        return typeId;
+    public QuestionType getType() {
+        return type;
     }
 
-    public void setTypeId(Long typeId) {
-        this.typeId = typeId;
+    public void setType(QuestionType type) {
+        this.type = type;
     }
 
-    public Boolean getIsPrivate() {
+    public boolean isPrivate() {
         return isPrivate;
     }
 
-    public void setIsPrivate(Boolean isPrivate) {
-        this.isPrivate = isPrivate;
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 
     public String getContent() {
@@ -84,33 +86,19 @@ public class QuizQuestion {
         this.content = content;
     }
 
-    public Timestamp getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Timestamp getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Timestamp updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    // toString untuk debugging
-    @Override
-    public String toString() {
-        return "QuizQuestion{" +
-                "id=" + id +
-                ", quizId=" + quizId +
-                ", typeId=" + typeId +
-                ", isPrivate=" + isPrivate +
-                ", content='" + content + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
     }
 }
