@@ -30,9 +30,14 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(userService.createUser(userDTO));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserDTO> loginUser(@RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.loginUser(userDTO.getUsername(), userDTO.getEmail()));
     }
 
     @PutMapping("/{id}")

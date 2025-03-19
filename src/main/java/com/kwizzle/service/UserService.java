@@ -46,7 +46,7 @@ public class UserService {
         user.setName(userDTO.getName());
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
-        user.setPasswordHash(passwordEncoder.encode(userDTO.getEmail())); // Hash password sebelum disimpan
+        user.setPasswordHash(passwordEncoder.encode(userDTO.getEmail()));
         user.setRole(userDTO.getRole());
         user.setStatus(userDTO.getStatus());
         user.setRegisteredAt(LocalDateTime.now());
@@ -55,7 +55,7 @@ public class UserService {
 
         user = userRepository.save(user);
 
-        String token = jwtUtil.generateToken(user.getUsername()); // Generate token setelah user dibuat
+        String token = jwtUtil.generateToken(user.getUsername());
 
         return new UserDTO(
                 user.getId(),
@@ -99,7 +99,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (passwordEncoder.matches(password, user.getPasswordHash())) {
-            String token = jwtUtil.generateToken(user.getUsername()); // Generate token saat login
+            String token = jwtUtil.generateToken(user.getUsername());
             return new UserDTO(
                     user.getId(),
                     user.getName(),
