@@ -3,7 +3,6 @@ package com.kwizzle.model;
 import com.kwizzle.enums.Role;
 import com.kwizzle.enums.UserStatus;
 import jakarta.persistence.*;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 

@@ -4,6 +4,7 @@ import com.kwizzle.config.JwtUtil;
 import com.kwizzle.dto.UserDTO;
 import com.kwizzle.model.User;
 import com.kwizzle.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,8 @@ public class UserService {
 
         user = userRepository.save(user);
 
-        String token = jwtUtil.generateToken(user.getUsername());
+        // Now passing the User object instead of just the username
+        String token = jwtUtil.generateToken((UserDetails) user);
 
         return new UserDTO(
                 user.getId(),
@@ -99,7 +101,8 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (passwordEncoder.matches(password, user.getPasswordHash())) {
-            String token = jwtUtil.generateToken(user.getUsername());
+            // Passing the User object instead of just the username
+            String token = jwtUtil.generateToken((UserDetails) user);
             return new UserDTO(
                     user.getId(),
                     user.getName(),
