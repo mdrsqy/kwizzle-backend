@@ -11,11 +11,13 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long hostId;
+    @ManyToOne
+    @JoinColumn(name = "host_id", nullable = false)
+    private User host;
 
-    @Column(nullable = false)
-    private Long categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Column(nullable = false, length = 75)
     private String title;
@@ -23,14 +25,11 @@ public class Quiz {
     @Column(length = 100)
     private String metaTitle;
 
-    @Column(unique = true, nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String slug;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String summary;
-
-    @Column(nullable = false)
-    private Long typeId;
 
     @Column(columnDefinition = "SMALLINT DEFAULT 0")
     private int score;
@@ -40,7 +39,7 @@ public class Quiz {
 
     private Integer timeLimit;
 
-    @Column(unique = true, length = 20)
+    @Column(length = 20, unique = true)
     private String joinCode;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -50,25 +49,20 @@ public class Quiz {
     private LocalDateTime updatedAt;
 
     private LocalDateTime publishedAt;
-    private LocalDateTime startsAt;
-    private LocalDateTime endsAt;
 
-    // Constructor tanpa parameter
+    // Constructors
     public Quiz() {}
 
-    // Constructor dengan parameter lengkap
-    public Quiz(Long id, Long hostId, Long categoryId, String title, String metaTitle, String slug, String summary,
-                Long typeId, int score, boolean published, Integer timeLimit, String joinCode,
-                LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt,
-                LocalDateTime startsAt, LocalDateTime endsAt) {
+    public Quiz(Long id, User host, Category category, String title, String metaTitle, String slug,
+                String summary, int score, boolean published, Integer timeLimit, String joinCode,
+                LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
         this.id = id;
-        this.hostId = hostId;
-        this.categoryId = categoryId;
+        this.host = host;
+        this.category = category;
         this.title = title;
         this.metaTitle = metaTitle;
         this.slug = slug;
         this.summary = summary;
-        this.typeId = typeId;
         this.score = score;
         this.published = published;
         this.timeLimit = timeLimit;
@@ -76,11 +70,9 @@ public class Quiz {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.publishedAt = publishedAt;
-        this.startsAt = startsAt;
-        this.endsAt = endsAt;
     }
 
-    // Getter dan Setter untuk setiap atribut
+    // Getters & Setters
     public Long getId() {
         return id;
     }
@@ -89,20 +81,20 @@ public class Quiz {
         this.id = id;
     }
 
-    public Long getHostId() {
-        return hostId;
+    public User getHost() {
+        return host;
     }
 
-    public void setHostId(Long hostId) {
-        this.hostId = hostId;
+    public void setHost(User host) {
+        this.host = host;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public String getTitle() {
@@ -135,14 +127,6 @@ public class Quiz {
 
     public void setSummary(String summary) {
         this.summary = summary;
-    }
-
-    public Long getTypeId() {
-        return typeId;
-    }
-
-    public void setTypeId(Long typeId) {
-        this.typeId = typeId;
     }
 
     public int getScore() {
@@ -199,21 +183,5 @@ public class Quiz {
 
     public void setPublishedAt(LocalDateTime publishedAt) {
         this.publishedAt = publishedAt;
-    }
-
-    public LocalDateTime getStartsAt() {
-        return startsAt;
-    }
-
-    public void setStartsAt(LocalDateTime startsAt) {
-        this.startsAt = startsAt;
-    }
-
-    public LocalDateTime getEndsAt() {
-        return endsAt;
-    }
-
-    public void setEndsAt(LocalDateTime endsAt) {
-        this.endsAt = endsAt;
     }
 }
