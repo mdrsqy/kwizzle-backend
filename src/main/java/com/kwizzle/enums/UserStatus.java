@@ -1,4 +1,7 @@
 package com.kwizzle.enums;
 
-public class UserStatus {
+public enum UserStatus {
+    ACTIVE,
+    INACTIVE,
+    BANNED
 }
