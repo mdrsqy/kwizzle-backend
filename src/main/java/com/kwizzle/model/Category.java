@@ -1,7 +1,7 @@
 package com.kwizzle.model;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "categories")
@@ -11,27 +11,26 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp createdAt;
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
 
-    // Constructor kosong
-    public Category() {
-    }
+    // Constructors
+    public Category() {}
 
-    // Constructor dengan parameter
-    public Category(String name, String description, Timestamp createdAt) {
+    public Category(Long id, String name, String description, LocalDateTime createdAt) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.createdAt = createdAt;
     }
 
-    // Getter dan Setter
+    // Getters & Setters
     public Long getId() {
         return id;
     }
@@ -56,22 +55,11 @@ public class Category {
         this.description = description;
     }
 
-    public Timestamp getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    // toString untuk debugging
-    @Override
-    public String toString() {
-        return "Category{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
     }
 }
