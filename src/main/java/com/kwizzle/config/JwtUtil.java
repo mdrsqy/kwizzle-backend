@@ -6,22 +6,24 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    private String secretKey = "secret"; // Use a more secure key in production
-
     public String generateToken(UserDetails userDetails) {
+        String secretKey = generateSecretKey(userDetails.getUsername());
+
         return Jwts.builder()
-                .setSubject(userDetails.getUsername()) // Get the username from UserDetails
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours expiration
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
+
+    private String generateSecretKey(String username) {
+        return "secret_" + username;
     }
 
     public String extractUsername(String token) {
@@ -38,6 +40,9 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
+        String username = extractUsername(token);
+        String secretKey = generateSecretKey(username);
+
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
@@ -48,18 +53,10 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // Token berlaku 10 jam
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
-    }
-
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
+        String secretKey = generateSecretKey(username);
+
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }
