@@ -1,10 +1,13 @@
 package com.kwizzle.service;
 
+import com.kwizzle.config.JwtUtil;
 import com.kwizzle.dto.UserDTO;
 import com.kwizzle.model.User;
 import com.kwizzle.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,10 +17,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public List<UserDTO> getAllUsers() {
@@ -44,11 +49,26 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(userDTO.getEmail())); // Hash password sebelum disimpan
         user.setRole(userDTO.getRole());
         user.setStatus(userDTO.getStatus());
-        user.setRegisteredAt(userDTO.getRegisteredAt());
-        user.setLastLogin(userDTO.getLastLogin());
+        user.setRegisteredAt(LocalDateTime.now());
+        user.setLastLogin(LocalDateTime.now());
         user.setProfile(userDTO.getProfile());
+
         user = userRepository.save(user);
-        return convertToDTO(user);
+
+        String token = jwtUtil.generateToken(user.getUsername()); // Generate token setelah user dibuat
+
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole(),
+                user.getStatus(),
+                user.getRegisteredAt(),
+                user.getLastLogin(),
+                user.getProfile(),
+                token
+        );
     }
 
     public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
@@ -58,8 +78,9 @@ public class UserService {
             user.setEmail(userDTO.getEmail());
             user.setRole(userDTO.getRole());
             user.setStatus(userDTO.getStatus());
-            user.setLastLogin(userDTO.getLastLogin());
+            user.setLastLogin(LocalDateTime.now());
             user.setProfile(userDTO.getProfile());
+
             user = userRepository.save(user);
             return convertToDTO(user);
         });
@@ -71,6 +92,29 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public UserDTO loginUser(String username, String password) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (passwordEncoder.matches(password, user.getPasswordHash())) {
+            String token = jwtUtil.generateToken(user.getUsername()); // Generate token saat login
+            return new UserDTO(
+                    user.getId(),
+                    user.getName(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getRole(),
+                    user.getStatus(),
+                    user.getRegisteredAt(),
+                    user.getLastLogin(),
+                    user.getProfile(),
+                    token
+            );
+        } else {
+            throw new IllegalArgumentException("Invalid password");
+        }
     }
 
     private UserDTO convertToDTO(User user) {

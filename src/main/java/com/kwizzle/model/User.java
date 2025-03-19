@@ -3,6 +3,8 @@ package com.kwizzle.model;
 import com.kwizzle.enums.Role;
 import com.kwizzle.enums.UserStatus;
 import jakarta.persistence.*;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -58,7 +60,7 @@ public class User {
         this.name = name;
     }
 
-    public String getUsername() {
+    public UserDetails getUsername() {
         return username;
     }
 
