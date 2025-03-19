@@ -3,27 +3,29 @@ package com.kwizzle.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    public String generateToken(UserDetails userDetails) {
-        String secretKey = generateSecretKey(userDetails.getUsername());
+    @Value("${jwt.secret}")
+    private String secretKey;
 
+    @Value("${jwt.expiration}")
+    private long expirationTime;
+
+    public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
-    }
-
-    private String generateSecretKey(String username) {
-        return "secret_" + username;
     }
 
     public String extractUsername(String token) {
@@ -40,9 +42,6 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        String username = extractUsername(token);
-        String secretKey = generateSecretKey(username);
-
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
@@ -55,8 +54,6 @@ public class JwtUtil {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        String secretKey = generateSecretKey(username);
-
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }

@@ -3,7 +3,6 @@ package com.kwizzle.config;
 import com.kwizzle.enums.UserStatus;
 import com.kwizzle.security.JwtAuthenticationFilter;
 import com.kwizzle.repository.UserRepository;
-import com.kwizzle.service.UserService;  // Assuming UserService is being used to handle user authentication
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,12 +34,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**", "/api/users/register", "/api/users/login").permitAll()
+                        .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+                        .requestMatchers("/api/users/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-                .authenticationProvider(authenticationProvider()) // Use the AuthenticationProvider here
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -63,8 +63,9 @@ public class SecurityConfig {
                 .map(user -> new org.springframework.security.core.userdetails.User(
                         user.getUsername(),
                         user.getPasswordHash(),
-                        user.getStatus() == UserStatus.ACTIVE, // Assuming the user needs to be active to login
-                        true, true, true, user.getRole().getAuthorities()))
+                        user.getStatus() == UserStatus.ACTIVE,
+                        true, true, true,
+                        user.getRole().getAuthorities()))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found")));
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
