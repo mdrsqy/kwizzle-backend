@@ -17,7 +17,7 @@ public class Category {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     // Constructors
@@ -30,7 +30,7 @@ public class Category {
         this.createdAt = createdAt;
     }
 
-    // Getters & Setters
+    // Getter & Setter
     public Long getId() {
         return id;
     }
@@ -61,5 +61,12 @@ public class Category {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
     }
 }
