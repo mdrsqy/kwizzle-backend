@@ -1,5 +1,6 @@
 package com.kwizzle.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -78,6 +79,7 @@ public class Quiz {
         this.id = id;
     }
 
+    @JsonProperty("host")
     public User getHost() {
         return host;
     }
@@ -86,6 +88,7 @@ public class Quiz {
         this.host = host;
     }
 
+    @JsonProperty("category")
     public Category getCategory() {
         return category;
     }
