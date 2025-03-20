@@ -11,11 +11,11 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id", nullable = false)
     private User host;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
@@ -34,9 +34,6 @@ public class Quiz {
     @Column(columnDefinition = "SMALLINT DEFAULT 0")
     private int score;
 
-    @Column(columnDefinition = "BOOLEAN DEFAULT false")
-    private boolean published;
-
     private Integer timeLimit;
 
     @Column(length = 20, unique = true)
@@ -48,14 +45,15 @@ public class Quiz {
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
-    private LocalDateTime publishedAt;
+    @Column(columnDefinition = "BOOLEAN DEFAULT false")
+    private boolean isPrivate;
 
     // Constructors
     public Quiz() {}
 
     public Quiz(Long id, User host, Category category, String title, String metaTitle, String slug,
-                String summary, int score, boolean published, Integer timeLimit, String joinCode,
-                LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
+                String summary, int score, Integer timeLimit, String joinCode,
+                LocalDateTime createdAt, LocalDateTime updatedAt, boolean isPrivate) {
         this.id = id;
         this.host = host;
         this.category = category;
@@ -64,12 +62,11 @@ public class Quiz {
         this.slug = slug;
         this.summary = summary;
         this.score = score;
-        this.published = published;
         this.timeLimit = timeLimit;
         this.joinCode = joinCode;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.publishedAt = publishedAt;
+        this.isPrivate = isPrivate;
     }
 
     // Getters & Setters
@@ -137,14 +134,6 @@ public class Quiz {
         this.score = score;
     }
 
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
     public Integer getTimeLimit() {
         return timeLimit;
     }
@@ -177,11 +166,11 @@ public class Quiz {
         this.updatedAt = updatedAt;
     }
 
-    public LocalDateTime getPublishedAt() {
-        return publishedAt;
+    public boolean isPrivate() {
+        return isPrivate;
     }
 
-    public void setPublishedAt(LocalDateTime publishedAt) {
-        this.publishedAt = publishedAt;
+    public void setPrivate(boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }
