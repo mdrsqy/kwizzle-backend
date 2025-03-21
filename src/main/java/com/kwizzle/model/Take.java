@@ -2,6 +2,7 @@ package com.kwizzle.model;
 
 import com.kwizzle.enums.TakeStatus;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,11 +13,11 @@ public class Take {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id", nullable = false)
     private Quiz quiz;
 
@@ -30,7 +31,7 @@ public class Take {
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private int duration;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "started_at")
@@ -40,6 +41,7 @@ public class Take {
     private LocalDateTime finishedAt;
 
     public Take() {
+        this.createdAt = LocalDateTime.now();
     }
 
     public Take(User user, Quiz quiz, TakeStatus status, int score, int duration, LocalDateTime startedAt, LocalDateTime finishedAt) {
@@ -50,6 +52,7 @@ public class Take {
         this.duration = duration;
         this.startedAt = startedAt;
         this.finishedAt = finishedAt;
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
