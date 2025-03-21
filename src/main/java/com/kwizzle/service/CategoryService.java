@@ -5,6 +5,7 @@ import com.kwizzle.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,11 @@ public class CategoryService {
     }
 
     public Category saveCategory(Category category) {
+        if (categoryRepository.existsByName(category.getName())) {
+            throw new IllegalArgumentException("Nama kategori sudah digunakan");
+        }
+
+        category.setCreatedAt(LocalDateTime.now());
         return categoryRepository.save(category);
     }
 
@@ -34,7 +40,24 @@ public class CategoryService {
         return categoryRepository.findByName(name);
     }
 
-    public void deleteCategory(Long id) {
-        categoryRepository.deleteById(id);
+    public Optional<Category> updateCategory(Long id, Category updatedCategory) {
+        return categoryRepository.findById(id).map(existing -> {
+            if (!existing.getName().equals(updatedCategory.getName()) &&
+                    categoryRepository.existsByName(updatedCategory.getName())) {
+                throw new IllegalArgumentException("Nama kategori sudah digunakan");
+            }
+
+            existing.setName(updatedCategory.getName());
+            existing.setDescription(updatedCategory.getDescription());
+            return categoryRepository.save(existing);
+        });
+    }
+
+    public boolean deleteCategory(Long id) {
+        if (categoryRepository.existsById(id)) {
+            categoryRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
