@@ -41,10 +41,10 @@ public class Quiz {
     private String joinCode;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Column(columnDefinition = "BOOLEAN DEFAULT false")
     private boolean isPrivate;
@@ -175,12 +175,5 @@ public class Quiz {
 
     public void setPrivate(boolean isPrivate) {
         this.isPrivate = isPrivate;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
     }
 }

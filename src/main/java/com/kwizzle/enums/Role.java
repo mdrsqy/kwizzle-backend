@@ -10,7 +10,6 @@ public enum Role {
     ADMIN,
     USER;
 
-    // Add this method to return authorities based on roles
     public Collection<GrantedAuthority> getAuthorities() {
         switch (this) {
             case ADMIN:
