@@ -21,7 +21,7 @@ public class TakeAnswer {
 
     @ManyToOne
     @JoinColumn(name = "answer_id")
-    private QuizAnswer answer;
+    private QuestionAnswer answer;
 
     @Column(name = "answered_at", updatable = false)
     private LocalDateTime answeredAt = LocalDateTime.now();
@@ -29,7 +29,7 @@ public class TakeAnswer {
     public TakeAnswer() {
     }
 
-    public TakeAnswer(Take take, QuizQuestion question, QuizAnswer answer, LocalDateTime answeredAt) {
+    public TakeAnswer(Take take, QuizQuestion question, QuestionAnswer answer, LocalDateTime answeredAt) {
         this.take = take;
         this.question = question;
         this.answer = answer;
@@ -60,11 +60,11 @@ public class TakeAnswer {
         this.question = question;
     }
 
-    public QuizAnswer getAnswer() {
+    public QuestionAnswer getAnswer() {
         return answer;
     }
 
-    public void setAnswer(QuizAnswer answer) {
+    public void setAnswer(QuestionAnswer answer) {
         this.answer = answer;
     }
 

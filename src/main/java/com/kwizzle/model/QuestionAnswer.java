@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "quiz_answer")
-public class QuizAnswer {
+@Table(name = "question_answer")
+public class QuestionAnswer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +24,11 @@ public class QuizAnswer {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public QuizAnswer() {
+    public QuestionAnswer() {
         this.createdAt = LocalDateTime.now();
     }
 
-    public QuizAnswer(Long id, QuizQuestion question, String content, boolean isCorrect) {
+    public QuestionAnswer(Long id, QuizQuestion question, String content, boolean isCorrect) {
         this.id = id;
         this.question = question;
         this.content = content;
