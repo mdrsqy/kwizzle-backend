@@ -22,7 +22,7 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllCategories() {
+    public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
@@ -33,8 +33,7 @@ public class CategoryController {
         if (category.isPresent()) {
             return ResponseEntity.ok(category.get());
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Kategori tidak ditemukan");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kategori tidak ditemukan");
         }
     }
 
@@ -44,8 +43,7 @@ public class CategoryController {
         if (category != null) {
             return ResponseEntity.ok(category);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Kategori tidak ditemukan");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kategori tidak ditemukan");
         }
     }
 
@@ -56,8 +54,7 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Kategori berhasil dibuat dengan ID: " + saved.getId());
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -68,12 +65,10 @@ public class CategoryController {
             if (updated.isPresent()) {
                 return ResponseEntity.ok("Kategori berhasil diperbarui");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Kategori tidak ditemukan");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kategori tidak ditemukan");
             }
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
@@ -83,8 +78,7 @@ public class CategoryController {
         if (deleted) {
             return ResponseEntity.ok("Kategori berhasil dihapus");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Kategori tidak ditemukan");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kategori tidak ditemukan");
         }
     }
 }
