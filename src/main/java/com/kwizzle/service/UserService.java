@@ -47,11 +47,13 @@ public class UserService {
     }
 
     public UserDTO createUser(UserDTO userDTO) {
-        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email already exists");
+        if (userRepository.findByUsername(userDTO.getUsername()).isPresent() &&
+                userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Username dan email sudah digunakan");
+        } else if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username sudah digunakan");
+        } else if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email sudah digunakan");
         }
 
         User user = new User();
@@ -95,21 +97,17 @@ public class UserService {
 
     public UserDTO loginUser(String username, String password) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Username tidak ditemukan"));
 
-        validatePassword(password, user.getPasswordHash());
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Password tidak sesuai");
+        }
 
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
         String token = generateUserToken(user);
         return convertToDTO(user, token);
-    }
-
-    private void validatePassword(String rawPassword, String encodedPassword) {
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new IllegalArgumentException("Invalid password");
-        }
     }
 
     private String generateUserToken(User user) {
@@ -139,18 +137,6 @@ public class UserService {
     }
 
     private UserDTO convertToDTO(User user) {
-        return new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPasswordHash(),
-                user.getRole(),
-                user.getStatus(),
-                user.getRegisteredAt(),
-                user.getLastLogin(),
-                user.getProfile(),
-                null
-        );
+        return convertToDTO(user, null);
     }
 }
