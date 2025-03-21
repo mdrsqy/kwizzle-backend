@@ -30,11 +30,24 @@ public class QuizService {
         return quizRepository.findById(id);
     }
 
-    public Quiz getQuizBySlug(String slug) {
-        return quizRepository.findBySlug(slug);
+    public Optional<Quiz> updateQuiz(Long id, Quiz quiz) {
+        return quizRepository.findById(id).map(existingQuiz -> {
+            existingQuiz.setTitle(quiz.getTitle());
+            existingQuiz.setSummary(quiz.getSummary());
+            existingQuiz.setScore(quiz.getScore());
+            existingQuiz.setTimeLimit(quiz.getTimeLimit());
+            existingQuiz.setJoinCode(quiz.getJoinCode());
+            existingQuiz.setUpdatedAt(quiz.getUpdatedAt());
+            existingQuiz.setPrivate(quiz.isPrivate());
+            return quizRepository.save(existingQuiz);
+        });
     }
 
-    public void deleteQuiz(Long id) {
-        quizRepository.deleteById(id);
+    public boolean deleteQuiz(Long id) {
+        if (quizRepository.existsById(id)) {
+            quizRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
