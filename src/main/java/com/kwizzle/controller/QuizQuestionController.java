@@ -37,7 +37,7 @@ public class QuizQuestionController {
         QuizQuestion savedQuizQuestion = quizQuestionService.saveQuizQuestion(quizQuestion);
         return ResponseEntity.ok(savedQuizQuestion);
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteQuizQuestion(@PathVariable Long id) {
         quizQuestionService.deleteQuizQuestion(id);
