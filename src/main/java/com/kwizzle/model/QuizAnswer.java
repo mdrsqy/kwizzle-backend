@@ -11,7 +11,7 @@ public class QuizAnswer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
     private QuizQuestion question;
 
@@ -21,21 +21,21 @@ public class QuizAnswer {
     @Column(name = "is_correct", columnDefinition = "BOOLEAN DEFAULT false")
     private boolean isCorrect;
 
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Constructors
-    public QuizAnswer() {}
+    public QuizAnswer() {
+        this.createdAt = LocalDateTime.now();
+    }
 
-    public QuizAnswer(Long id, QuizQuestion question, String content, boolean isCorrect, LocalDateTime createdAt) {
+    public QuizAnswer(Long id, QuizQuestion question, String content, boolean isCorrect) {
         this.id = id;
         this.question = question;
         this.content = content;
         this.isCorrect = isCorrect;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
     }
 
-    // Getters & Setters
     public Long getId() {
         return id;
     }
