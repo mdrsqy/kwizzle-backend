@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -36,12 +38,17 @@ public class QuizController {
     public ResponseEntity<?> getQuizById(@PathVariable Long id) {
         try {
             Optional<Quiz> quiz = quizService.getQuizById(id);
-            return quiz.map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body("Kuis dengan ID " + id + " tidak ditemukan."));
+            if (quiz.isPresent()) {
+                return ResponseEntity.ok(quiz.get());
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Kuis dengan ID " + id + " tidak ditemukan.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal mengambil kuis.");
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Gagal mengambil kuis.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
@@ -49,11 +56,13 @@ public class QuizController {
     public ResponseEntity<?> createQuiz(@RequestBody Quiz quiz) {
         try {
             Quiz savedQuiz = quizService.saveQuiz(quiz);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Kuis berhasil dibuat dengan ID: " + savedQuiz.getId());
+            Map<String, Object> successResponse = new HashMap<>();
+            successResponse.put("message", "Kuis berhasil dibuat dengan ID: " + savedQuiz.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(successResponse);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Gagal membuat kuis, pastikan semua data valid.");
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Gagal membuat kuis, pastikan semua data valid.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 
@@ -61,12 +70,19 @@ public class QuizController {
     public ResponseEntity<?> updateQuiz(@PathVariable Long id, @RequestBody Quiz quiz) {
         try {
             Optional<Quiz> updatedQuiz = quizService.updateQuiz(id, quiz);
-            return updatedQuiz.map(q -> ResponseEntity.ok("Kuis dengan ID " + id + " berhasil diperbarui."))
-                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body("Kuis dengan ID " + id + " tidak ditemukan."));
+            if (updatedQuiz.isPresent()) {
+                Map<String, String> successResponse = new HashMap<>();
+                successResponse.put("message", "Kuis dengan ID " + id + " berhasil diperbarui.");
+                return ResponseEntity.ok(successResponse);
+            } else {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Kuis dengan ID " + id + " tidak ditemukan.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Gagal memperbarui kuis, pastikan semua data valid.");
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Gagal memperbarui kuis, pastikan semua data valid.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
 
@@ -74,14 +90,18 @@ public class QuizController {
     public ResponseEntity<?> deleteQuiz(@PathVariable Long id) {
         try {
             if (quizService.deleteQuiz(id)) {
-                return ResponseEntity.ok("Kuis dengan ID " + id + " berhasil dihapus.");
+                Map<String, String> successResponse = new HashMap<>();
+                successResponse.put("message", "Kuis dengan ID " + id + " berhasil dihapus.");
+                return ResponseEntity.ok(successResponse);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Kuis dengan ID " + id + " tidak ditemukan.");
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Kuis dengan ID " + id + " tidak ditemukan.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Gagal menghapus kuis.");
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Gagal menghapus kuis.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 }

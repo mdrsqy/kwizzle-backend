@@ -27,10 +27,10 @@ public class QuizQuestion {
     private String content;
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     // Constructors
     public QuizQuestion() {}
@@ -100,12 +100,5 @@ public class QuizQuestion {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
     }
 }
