@@ -23,6 +23,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*\\d).{6,}$";
+    private static final String EMAIL_PATTERN = "^[^@\\s]+@[^@\\s]+$"; // Email pattern to check for '@'
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
@@ -55,13 +56,18 @@ public class UserService {
         }
 
         String username = userDTO.getUsername().toLowerCase();
+        String email = userDTO.getEmail().toLowerCase();  // Ensure email is in lowercase
+
+        if (!isValidEmail(email)) {
+            throw new IllegalArgumentException("Email must contain '@' symbol.");
+        }
 
         if (userRepository.findByUsername(username).isPresent() &&
-                userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+                userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("Username and email are already in use.");
         } else if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Username is already in use.");
-        } else if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+        } else if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("Email is already in use.");
         }
 
@@ -69,7 +75,7 @@ public class UserService {
         User user = new User();
         user.setName(userDTO.getName());
         user.setUsername(username);  // Save username in lowercase
-        user.setEmail(userDTO.getEmail());
+        user.setEmail(email);  // Save email in lowercase
         user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole());
         user.setStatus(userDTO.getStatus());
@@ -86,7 +92,7 @@ public class UserService {
         return userRepository.findById(id).map(user -> {
             user.setName(userDTO.getName());
             user.setUsername(userDTO.getUsername().toLowerCase());
-            user.setEmail(userDTO.getEmail());
+            user.setEmail(userDTO.getEmail().toLowerCase());
             user.setRole(userDTO.getRole());
             user.setStatus(userDTO.getStatus());
 
@@ -149,5 +155,9 @@ public class UserService {
 
     private boolean isValidPassword(String password) {
         return Pattern.matches(PASSWORD_PATTERN, password);
+    }
+
+    private boolean isValidEmail(String email) {
+        return Pattern.matches(EMAIL_PATTERN, email);  // Check if email contains '@'
     }
 }
