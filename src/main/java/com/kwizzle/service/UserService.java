@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +21,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+
+    private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*\\d).{6,}$";
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
@@ -47,18 +50,25 @@ public class UserService {
     }
 
     public UserDTO createUser(UserDTO userDTO) {
-        if (userRepository.findByUsername(userDTO.getUsername()).isPresent() &&
-                userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Username dan email sudah digunakan");
-        } else if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Username sudah digunakan");
-        } else if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email sudah digunakan");
+        if (!isValidPassword(userDTO.getPassword())) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long, contain at least 1 uppercase letter and 1 number.");
         }
 
+        String username = userDTO.getUsername().toLowerCase();
+
+        if (userRepository.findByUsername(username).isPresent() &&
+                userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Username and email are already in use.");
+        } else if (userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username is already in use.");
+        } else if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email is already in use.");
+        }
+
+        // Create and save the user
         User user = new User();
         user.setName(userDTO.getName());
-        user.setUsername(userDTO.getUsername());
+        user.setUsername(username);  // Save username in lowercase
         user.setEmail(userDTO.getEmail());
         user.setPasswordHash(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole());
@@ -75,7 +85,7 @@ public class UserService {
     public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
         return userRepository.findById(id).map(user -> {
             user.setName(userDTO.getName());
-            user.setUsername(userDTO.getUsername());
+            user.setUsername(userDTO.getUsername().toLowerCase());
             user.setEmail(userDTO.getEmail());
             user.setRole(userDTO.getRole());
             user.setStatus(userDTO.getStatus());
@@ -95,10 +105,10 @@ public class UserService {
 
     public UserDTO loginUser(String username, String password) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Username tidak ditemukan"));
+                .orElseThrow(() -> new IllegalArgumentException("Username not found"));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw new IllegalArgumentException("Password tidak sesuai");
+            throw new IllegalArgumentException("Incorrect password");
         }
 
         user.setLastLogin(LocalDateTime.now());
@@ -135,5 +145,9 @@ public class UserService {
 
     private UserDTO convertToDTO(User user) {
         return convertToDTO(user, null);
+    }
+
+    private boolean isValidPassword(String password) {
+        return Pattern.matches(PASSWORD_PATTERN, password);
     }
 }
