@@ -53,17 +53,13 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS Configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        // Allow the frontend domains for Flutter and Next.js
-        // Add the Flutter app and Next.js frontend URL here
-        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8081")); // Modify according to your frontend URLs
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8081"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        config.setAllowCredentials(true);  // Allow credentials (cookies or headers)
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
