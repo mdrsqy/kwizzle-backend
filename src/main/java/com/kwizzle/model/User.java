@@ -39,9 +39,6 @@ public class User {
     @Column
     private LocalDateTime lastLogin;
 
-    @Column(columnDefinition = "TEXT")
-    private String profile;
-
     // Getters and Setters
     public Long getId() {
         return id;
@@ -113,13 +110,5 @@ public class User {
 
     public void setLastLogin(LocalDateTime lastLogin) {
         this.lastLogin = lastLogin;
-    }
-
-    public String getProfile() {
-        return profile;
-    }
-
-    public void setProfile(String profile) {
-        this.profile = profile;
     }
 }

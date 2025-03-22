@@ -14,12 +14,11 @@ public class UserDTO {
     private UserStatus status;
     private LocalDateTime registeredAt;
     private LocalDateTime lastLogin;
-    private String profile;
     private String token;
 
     public UserDTO() {}
 
-    public UserDTO(Long id, String name, String username, String email, String password, Role role, UserStatus status, LocalDateTime registeredAt, LocalDateTime lastLogin, String profile, String token) {
+    public UserDTO(Long id, String name, String username, String email, String password, Role role, UserStatus status, LocalDateTime registeredAt, LocalDateTime lastLogin, String token) {
         this.id = id;
         this.name = name;
         this.username = username;
@@ -29,7 +28,6 @@ public class UserDTO {
         this.status = status;
         this.registeredAt = registeredAt;
         this.lastLogin = lastLogin;
-        this.profile = profile;
         this.token = token;
     }
 
@@ -103,14 +101,6 @@ public class UserDTO {
 
     public void setLastLogin(LocalDateTime lastLogin) {
         this.lastLogin = lastLogin;
-    }
-
-    public String getProfile() {
-        return profile;
-    }
-
-    public void setProfile(String profile) {
-        this.profile = profile;
     }
 
     public String getToken() {

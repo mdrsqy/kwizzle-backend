@@ -65,7 +65,6 @@ public class UserService {
         user.setStatus(userDTO.getStatus());
         user.setRegisteredAt(LocalDateTime.now());
         user.setLastLogin(null);
-        user.setProfile(userDTO.getProfile());
 
         user = userRepository.save(user);
 
@@ -80,7 +79,6 @@ public class UserService {
             user.setEmail(userDTO.getEmail());
             user.setRole(userDTO.getRole());
             user.setStatus(userDTO.getStatus());
-            user.setProfile(userDTO.getProfile());
 
             user = userRepository.save(user);
             return convertToDTO(user);
@@ -131,7 +129,6 @@ public class UserService {
                 user.getStatus(),
                 user.getRegisteredAt(),
                 user.getLastLogin(),
-                user.getProfile(),
                 token
         );
     }
