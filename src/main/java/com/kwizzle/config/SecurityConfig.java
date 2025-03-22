@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()  // You can modify this if you want specific routes to be accessible
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -53,13 +53,17 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // CORS Configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*"));
+
+        // Allow the frontend domains for Flutter and Next.js
+        // Add the Flutter app and Next.js frontend URL here
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8081")); // Modify according to your frontend URLs
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        config.setAllowCredentials(false);
+        config.setAllowCredentials(true);  // Allow credentials (cookies or headers)
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
